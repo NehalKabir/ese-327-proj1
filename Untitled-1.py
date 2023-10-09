@@ -8,10 +8,10 @@ X = iris.data.features
 y = iris.data.targets 
   
 # metadata 
-print(iris.metadata) 
+#print(iris.metadata) 
   
 # variable information 
-print(iris.variables) 
+#print(iris.variables) 
 
 
 class Tree:
@@ -39,4 +39,7 @@ left.data = "left"
 right.data = "right"
 middle.data = "middle"
 middle.connect = right
-middle.PrintConnect()
+left2 = Tree("left2")
+left2.data = "left2"
+left.children = [left2]
+root.PrintTree()   
