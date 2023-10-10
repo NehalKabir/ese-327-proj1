@@ -8,6 +8,21 @@ print(df)
 invoice = df[0]
 stockCode = df[1]
 
+def MakeTransactionList(invoice, itemCode):
+    transactionList = []
+    curInvoice = invoice[0]
+    curTransaction = []
+    for i in range(0, invoice.size):
+        if invoice[i] == curInvoice:
+            curTransaction.append(itemCode[i])
+        else:
+            transactionList.append(curTransaction)
+            curTransaction = []
+            curInvoice = invoice[i]
+            curTransaction.append(itemCode[i])
+    print(transactionList)
+    return transactionList
+
 class Tree:
     def __init__(self, data):
         self.children = []
