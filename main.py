@@ -5,12 +5,12 @@ data = pd.read_excel('C:\Class Folders\ESE327\mainProject\online_retail_II.xlsx'
 df = pd.DataFrame(data, columns=['Invoice', 'StockCode'])
 print(df)
 
-invoice = df[0]
-stockCode = df[1]
+invoice = df['Invoice']
+stockCode = df['StockCode']
 
 #get count of stock code 
 #val_count returs the count of each item and even sorts in decreasing order
-stockcode_counts = df[1].value_counts()
+stockcode_counts = df['StockCode'].value_counts()
 
 # Print the counts.
 print(stockcode_counts)
