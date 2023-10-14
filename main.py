@@ -8,6 +8,13 @@ print(df)
 invoice = df[0]
 stockCode = df[1]
 
+#get count of stock code 
+#val_count returs the count of each item and even sorts in decreasing order
+stockcode_counts = df[1].value_counts()
+
+# Print the counts.
+print(stockcode_counts)
+
 def MakeTransactionList(invoice, itemCode):
     transactionList = []
     curInvoice = invoice[0]
