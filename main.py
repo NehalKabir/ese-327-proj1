@@ -64,24 +64,24 @@ def gentree(data):
         for y in x:
             if count == 0:
                 if (y in root.strchild()):
-                    print("current invoice")
-                    print(x)
-                    print('current stockcode')
-                    print(y)
-                    print("stockcode found in root children, incrementing coounter")
-                    print('========================')
+                    #print("current invoice")
+                    #print(x)
+                    #print('current stockcode')
+                    #print(y)
+                    #print("stockcode found in root children, incrementing coounter")
+                    #print('========================')
                     d= root.strchild().index(y)
                     root.children[d].incc()
                     hold = root.children[d]
                     count=count+1
                     
                 else:
-                    print("current invoice")
-                    print(x)
-                    print('current stockcode')
-                    print(y)
-                    print("stockcode not found in root children, adding new node")
-                    print('========================')
+                    #print("current invoice")
+                    #print(x)
+                    #print('current stockcode')
+                    #print(y)
+                    #print("stockcode not found in root children, adding new node")
+                    #print('========================')
                     treep.append(Tree(y))
                     root.children.append(treep[treecount])
                     treep[treecount].connect = root
@@ -91,21 +91,21 @@ def gentree(data):
                 
             else:
                 if (y in hold.strchild()):
-                    print("current invoice")
-                    print(x)
-                    print('current stockcode')
-                    print(y)
-                    print("stockcode found in node children, incrementing coounter")
-                    print('========================')
+                    #print("current invoice")
+                    #print(x)
+                    #print('current stockcode')
+                    #print(y)
+                    #print("stockcode found in node children, incrementing coounter")
+                    #print('========================')
                     d= hold.strchild().index(y)
                     hold.children[d].incc()
                     hold = hold.children[d]
                 else:
-                    print("current invoice")
-                    print(x)
-                    print('current stockcode')
-                    print(y)
-                    print("stockcode not found in node children, adding new node")
+                    #print("current invoice")
+                    #print(x)
+                    #print('current stockcode')
+                    #print(y)
+                    #print("stockcode not found in node children, adding new node")
                     treep.append(Tree(y))
                     hold.children.append(treep[treecount])
                     treep[treecount].connect = hold
@@ -122,26 +122,27 @@ def gentree(data):
     treep[1].PrintChildren()
     return root
 
-def makePointers(start, dataTree):
+def makePointers(start, dataTree, itemCounts):
     out =[]   
     for x in dataTree.children:
         if x.data == start.data:
             out.append(x)
-        else:
-            out2 = (makePointers(start, x))
+        elif itemCounts[x.data] >=itemCounts[start.data] :
+            out2 = (makePointers(start, x, itemCounts))
             if out2: #check if list is empty
                 out.extend(out2)
     return out
 
 def makePointerList(itemCounts, dataTree):
     pointerList = []
-    for index, count in ser.items():
-        temp = Tree(index)
-        listOfItemNodes = makePointers(temp, dataTree1)
-        temp.same = listOfItemNodes[0]
-        for x in range(len(listOfItemNodes) - 1):
-            listOfItemNodes[x].same = listOfItemNodes[x + 1]
-        pointerList.append(temp)
+    for index, count in itemCounts.items():
+        if count > 500: #threshold value
+            temp = Tree(index)
+            listOfItemNodes = makePointers(temp, dataTree, itemCounts)
+            temp.same = listOfItemNodes[0]
+            for x in range(len(listOfItemNodes) - 1):
+                listOfItemNodes[x].same = listOfItemNodes[x + 1]
+            pointerList.append(temp)
     return pointerList
 
 n = 'C:/Class Folders/ESE327/mainProject/filtered_excel_file.xlsx'
@@ -154,11 +155,17 @@ stockCode = df['StockCode']
 #get count of stock code 
 #val_count returs the count of each item and even sorts in decreasing order
 stockcode_counts = df['StockCode'].value_counts()
+print(stockcode_counts)
 
 transaction_data = df[['Invoice', 'StockCode']]
 # Use the MakeTransactionList function on the 'transaction_data' DataFrame
 ordered_transaction_list = MakeTransactionList(transaction_data['Invoice'], transaction_data['StockCode'])
 
+dataTree = gentree(ordered_transaction_list)
+
+pointerList = makePointerList(stockcode_counts, dataTree)
+
+'''
 data1= ['1','2','5',], ['3','4'],['1','3'], ['1','2']
 treepoint=[]    
 dataTree1 = gentree(data1)
@@ -168,6 +175,6 @@ ser = pd.Series(data=stockData1, index=['1', '2', '3', '4', '5'])
 #print(ser)
 
 pointerList = makePointerList(ser, dataTree1)
-
+'''
 print("done")
 
