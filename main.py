@@ -1,20 +1,10 @@
 import pandas as pd
 
-#TODO: make excel file a function
-data = pd.read_excel('C:\Class Folders\ESE327\mainProject\online_retail_II.xlsx') 
-df = pd.DataFrame(data, columns=['Invoice', 'StockCode'])
-print(df)
-
-invoice = df['Invoice']
-stockCode = df['StockCode']
-
-#get count of stock code 
-#val_count returs the count of each item and even sorts in decreasing order
-stockcode_counts = df['StockCode'].value_counts()
-
-# Print the counts.
-print(stockcode_counts)
-transaction_data = df[['Invoice', 'StockCode']]
+def extractex(filename, col):
+    data = pd.read_excel(filename) 
+    df = pd.DataFrame(data, columns=col)
+    #print(df)
+    return df
 
 # Define the MakeTransactionList function (as previously corrected)
 def MakeTransactionList(invoice, itemCode):
@@ -32,18 +22,13 @@ def MakeTransactionList(invoice, itemCode):
     transactionList.sort(key=len, reverse=True)
     return transactionList
 
-# Use the MakeTransactionList function on the 'transaction_data' DataFrame
-ordered_transaction_list = MakeTransactionList(transaction_data['Invoice'], transaction_data['StockCode'])
-
-# Print the ordered_transaction_list
-for transaction in ordered_transaction_list:
-    print(transaction)
-
 class Tree:
     def __init__(self, data):
         self.children = []
         self.connect = None
+        self.same = None
         self.data = data
+        self.count = 1
     def PrintTree(self):
         print(self.data)
         for i in self.children:
@@ -52,22 +37,137 @@ class Tree:
         print(self.data)
         if self.connect != None:
             self.connect.PrintConnect()
+    def PrintChildren(self):
+        print(self.data)
+        if self.children != []:
+            for x in self.children:
+                print(x.data)
+    def getdata(self):
+        return self.data
+    def getcount(self):
+        return self.count
+    def strchild(self): #get children
+        sc = []
+        for x in self.children:
+            sc.append(x.data)
+        return sc
+    def incc(self):
+        self.count=self.count+1
 
+def gentree(data):
+    root = Tree("root")
+    hold = root
+    treep=[]
+    treecount=0
+    for x in data:
+        count = 0
+        for y in x:
+            if count == 0:
+                if (y in root.strchild()):
+                    print("current invoice")
+                    print(x)
+                    print('current stockcode')
+                    print(y)
+                    print("stockcode found in root children, incrementing coounter")
+                    print('========================')
+                    d= root.strchild().index(y)
+                    root.children[d].incc()
+                    hold = root.children[d]
+                    count=count+1
+                    
+                else:
+                    print("current invoice")
+                    print(x)
+                    print('current stockcode')
+                    print(y)
+                    print("stockcode not found in root children, adding new node")
+                    print('========================')
+                    treep.append(Tree(y))
+                    root.children.append(treep[treecount])
+                    treep[treecount].connect = root
+                    hold = treep[treecount]
+                    count= count+1
+                    treecount=treecount+1
+                
+            else:
+                if (y in hold.strchild()):
+                    print("current invoice")
+                    print(x)
+                    print('current stockcode')
+                    print(y)
+                    print("stockcode found in node children, incrementing coounter")
+                    print('========================')
+                    d= hold.strchild().index(y)
+                    hold.children[d].incc()
+                    hold = hold.children[d]
+                else:
+                    print("current invoice")
+                    print(x)
+                    print('current stockcode')
+                    print(y)
+                    print("stockcode not found in node children, adding new node")
+                    treep.append(Tree(y))
+                    hold.children.append(treep[treecount])
+                    treep[treecount].connect = hold
+                    hold = treep[treecount]
+                    treecount=treecount+1
 
+                    
+    print('===================')
+            
+    root.PrintChildren()
+    print('=================')
+    print(treep[2].getdata())
+    print(treep[2].getcount())
+    treep[1].PrintChildren()
+    return root
 
-'''
-left = Tree("left")
-middle = Tree("middle")
-right = Tree("right")
-root = Tree("root")
-root.children = [left, middle, right]
-root.data = "root"
-left.data = "left"
-right.data = "right"
-middle.data = "middle"
-middle.connect = right
-left2 = Tree("left2")
-left2.data = "left2"
-left.children = [left2]
-root.PrintTree()   '''
+def makePointers(start, dataTree):
+    out =[]   
+    for x in dataTree.children:
+        if x.data == start.data:
+            out.append(x)
+        else:
+            out2 = (makePointers(start, x))
+            if out2: #check if list is empty
+                out.extend(out2)
+    return out
+
+def makePointerList(itemCounts, dataTree):
+    pointerList = []
+    for index, count in ser.items():
+        temp = Tree(index)
+        listOfItemNodes = makePointers(temp, dataTree1)
+        temp.same = listOfItemNodes[0]
+        for x in range(len(listOfItemNodes) - 1):
+            listOfItemNodes[x].same = listOfItemNodes[x + 1]
+        pointerList.append(temp)
+    return pointerList
+
+n = 'C:/Class Folders/ESE327/mainProject/filtered_excel_file.xlsx'
+co= ['Invoice', 'StockCode']
+df= extractex(n, co)
+
+invoice = df['Invoice']
+stockCode = df['StockCode']
+
+#get count of stock code 
+#val_count returs the count of each item and even sorts in decreasing order
+stockcode_counts = df['StockCode'].value_counts()
+
+transaction_data = df[['Invoice', 'StockCode']]
+# Use the MakeTransactionList function on the 'transaction_data' DataFrame
+ordered_transaction_list = MakeTransactionList(transaction_data['Invoice'], transaction_data['StockCode'])
+
+data1= ['1','2','5',], ['3','4'],['1','3'], ['1','2']
+treepoint=[]    
+dataTree1 = gentree(data1)
+#dataTree1.PrintTree()
+stockData1 = {'1': 3, '2': 2, '3': 2, '4': 1, '5': 1}
+ser = pd.Series(data=stockData1, index=['1', '2', '3', '4', '5'])
+#print(ser)
+
+pointerList = makePointerList(ser, dataTree1)
+
+print("done")
 
