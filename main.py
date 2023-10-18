@@ -14,7 +14,9 @@ stockcode_counts = df['StockCode'].value_counts()
 
 # Print the counts.
 print(stockcode_counts)
+transaction_data = df[['Invoice', 'StockCode']]
 
+# Define the MakeTransactionList function (as previously corrected)
 def MakeTransactionList(invoice, itemCode):
     transactionList = []
     curInvoice = invoice[0]
@@ -24,11 +26,18 @@ def MakeTransactionList(invoice, itemCode):
             curTransaction.append(itemCode[i])
         else:
             transactionList.append(curTransaction)
-            curTransaction = []
+            curTransaction = [itemCode[i]]  # Start a new transaction
             curInvoice = invoice[i]
-            curTransaction.append(itemCode[i])
-    print(transactionList)
+    transactionList.append(curTransaction)
+    transactionList.sort(key=len, reverse=True)
     return transactionList
+
+# Use the MakeTransactionList function on the 'transaction_data' DataFrame
+ordered_transaction_list = MakeTransactionList(transaction_data['Invoice'], transaction_data['StockCode'])
+
+# Print the ordered_transaction_list
+for transaction in ordered_transaction_list:
+    print(transaction)
 
 class Tree:
     def __init__(self, data):
