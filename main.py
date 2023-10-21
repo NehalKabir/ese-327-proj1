@@ -1,4 +1,5 @@
 import pandas as pd
+import copy
 
 def extractex(filename, col):
     data = pd.read_excel(filename) 
@@ -29,6 +30,8 @@ class Tree:
         self.same = None
         self.data = data
         self.count = 1
+    def __str__(self):
+        return f"Item: {self.data} count: {self.count}"
     def PrintTree(self):
         print(self.data)
         for i in self.children:
@@ -113,13 +116,13 @@ def gentree(data):
                     treecount=treecount+1
 
                     
-    print('===================')
+    #print('===================')
             
-    root.PrintChildren()
-    print('=================')
-    print(treep[2].getdata())
-    print(treep[2].getcount())
-    treep[1].PrintChildren()
+    #root.PrintChildren()
+    #print('=================')
+    #print(treep[2].getdata())
+    #print(treep[2].getcount())
+    #treep[1].PrintChildren()
     return root
 
 def makePointers(start, dataTree, itemCounts):
@@ -148,19 +151,25 @@ def makePointerList(itemCounts, dataTree, threshold):
 def findFreqSets(pointerList, threshold):
     freqItems = []
     for i in reversed(pointerList):
-        temp = i
+        temp = copy.deepcopy(i)
         totalBranch = []
+        added = False
         while temp.same != None:
             temp = temp.same
             countVal = temp.count
-            temp2 = temp.connect
+            if countVal >= threshold and added == False:
+                tempList = [temp]
+                freqItems.append(tempList)
+                added = True
+            temp2 = copy.deepcopy(temp.connect)
             curBranch = []
             while temp2.data != "root":
                 temp2.count = countVal
                 curBranch.append(temp2)
                 temp2 = temp2.connect
             curBranch.reverse()
-            totalBranch.append(curBranch)
+            if curBranch:
+                totalBranch.append(curBranch)
         if(len(totalBranch) == 1):
             totalBranch[0].append(i)
             freqItems.append(totalBranch[0])
@@ -174,7 +183,6 @@ def findFreqSets(pointerList, threshold):
             for j in tempItems: #CHECK THIS PART
                 j.append(temp)
             freqItems.extend(tempItems)
-    print(freqItems)
     return freqItems
 
 def genTreeData(branchList):
@@ -183,7 +191,8 @@ def genTreeData(branchList):
         curList = []
         for item in i:
             curList.append(item.data)
-        output.append(curList)
+        for j in range(i[0].count):
+            output.append(curList)
     return output
 
 def makeTempSeries(data_count_list):
@@ -253,4 +262,7 @@ ser = pd.Series(data=stockData1, index=['1', '2', '3', '4', '5'])
 
 pointerList = makePointerList(ser, dataTree1, threshold)
 a = findFreqSets(pointerList, threshold)
-print(a)
+filtered_list = [inner_list for inner_list in a if len(inner_list) > 1]
+for inner_list in filtered_list:
+        data_list = [obj.data for obj in inner_list]
+        print(data_list)
