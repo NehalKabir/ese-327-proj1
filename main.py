@@ -216,11 +216,13 @@ def makeTempSeries(data_count_list):
 
 
 threshold = 2
-'''
-n = 'C:/Class Folders/ESE327/mainProject/filtered_excel_file.xlsx'
+#extracts the first 2 coumns to be used for the transaction
+n = 'filtered_excel_file.xlsx'
 co= ['Invoice', 'StockCode']
-df= extractex(n, co)
-
+#df= extractex(n, co)
+data = pd.read_excel('filtered_excel_file.xlsx') 
+df = pd.DataFrame(data, columns=['Invoice', 'StockCode'])
+print(df)
 invoice = df['Invoice']
 stockCode = df['StockCode']
 
@@ -236,7 +238,13 @@ ordered_transaction_list = MakeTransactionList(transaction_data['Invoice'], tran
 dataTree = gentree(ordered_transaction_list)
 
 pointerList = makePointerList(stockcode_counts, dataTree, threshold)
-'''
+
+a = findFreqSets(pointerList, threshold)
+filtered_list = [inner_list for inner_list in a if len(inner_list) > 1]
+for inner_list in filtered_list:
+        data_list = [obj.data for obj in inner_list]
+        print(data_list)
+
 
 '''
 data1= ['1','2','5',], ['3','4'],['1','3'], ['1','2']
@@ -251,7 +259,7 @@ pointerList = makePointerList(ser, dataTree1, threshold)
 a = findFreqSets(pointerList, threshold)
 print("done")
 '''
-
+'''
 #textbook example
 data1= [['2','1','5'], ['2','4'],['2','3'], ['2','1', '4'], ['1', '3'], ['2','3'], ['1', '3'], ['2','1', '3', '5'], ['2','1', '3',]]    
 dataTree1 = gentree(data1)
@@ -266,3 +274,4 @@ filtered_list = [inner_list for inner_list in a if len(inner_list) > 1]
 for inner_list in filtered_list:
         data_list = [obj.data for obj in inner_list]
         print(data_list)
+    '''
